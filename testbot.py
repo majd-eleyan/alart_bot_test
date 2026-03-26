@@ -129,7 +129,24 @@ for chat_id in users:
 
 last_update_id = None
 last_check_time = 0
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
 
+# ---------- FAKE SERVER ----------
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+
+def run_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), Handler)
+    server.serve_forever()
+
+# ---------- RUN BOT + SERVER ----------
+threading.Thread(target=run_server).start()
 while True:
     try:
         updates = get_updates(last_update_id)
